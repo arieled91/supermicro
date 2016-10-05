@@ -1,4 +1,4 @@
-// Generated from Micro.g4 by ANTLR 4.5.3
+package micro;// Generated from Micro.g4 by ANTLR 4.5.3
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -27,13 +27,13 @@ public class MicroBaseListener implements MicroListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSentenceList(MicroParser.SentenceListContext ctx) { }
+	@Override public void enterListOfSentence(MicroParser.ListOfSentenceContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSentenceList(MicroParser.SentenceListContext ctx) { }
+	@Override public void exitListOfSentence(MicroParser.ListOfSentenceContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -51,25 +51,25 @@ public class MicroBaseListener implements MicroListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIdentifierList(MicroParser.IdentifierListContext ctx) { }
+	@Override public void enterListOfIdentifier(MicroParser.ListOfIdentifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIdentifierList(MicroParser.IdentifierListContext ctx) { }
+	@Override public void exitListOfIdentifier(MicroParser.ListOfIdentifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExpessionList(MicroParser.ExpessionListContext ctx) { }
+	@Override public void enterListOfExpression(MicroParser.ListOfExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExpessionList(MicroParser.ExpessionListContext ctx) { }
+	@Override public void exitListOfExpression(MicroParser.ListOfExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

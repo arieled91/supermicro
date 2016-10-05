@@ -1,4 +1,4 @@
-// Generated from Micro.g4 by ANTLR 4.5.3
+package micro;// Generated from Micro.g4 by ANTLR 4.5.3
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -20,10 +20,10 @@ public class MicroParser extends Parser {
 		Comma=8, RightParen=9, LeftParen=10, Assign=11, Semicolon=12, Begin=13, 
 		End=14, Read=15, Write=16, Ignore=17;
 	public static final int
-		RULE_program = 0, RULE_sentenceList = 1, RULE_sentence = 2, RULE_identifierList = 3, 
-		RULE_expessionList = 4, RULE_expression = 5, RULE_primary = 6;
+		RULE_program = 0, RULE_listOfSentence = 1, RULE_sentence = 2, RULE_listOfIdentifier = 3, 
+		RULE_listOfExpression = 4, RULE_expression = 5, RULE_primary = 6;
 	public static final String[] ruleNames = {
-		"program", "sentenceList", "sentence", "identifierList", "expessionList", 
+		"program", "listOfSentence", "sentence", "listOfIdentifier", "listOfExpression", 
 		"expression", "primary"
 	};
 
@@ -87,8 +87,8 @@ public class MicroParser extends Parser {
 	}
 	public static class ProgramContext extends ParserRuleContext {
 		public TerminalNode Begin() { return getToken(MicroParser.Begin, 0); }
-		public SentenceListContext sentenceList() {
-			return getRuleContext(SentenceListContext.class,0);
+		public ListOfSentenceContext listOfSentence() {
+			return getRuleContext(ListOfSentenceContext.class,0);
 		}
 		public TerminalNode End() { return getToken(MicroParser.End, 0); }
 		public ProgramContext(ParserRuleContext parent, int invokingState) {
@@ -97,11 +97,11 @@ public class MicroParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_program; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterProgram(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterProgram(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitProgram(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitProgram(this);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class MicroParser extends Parser {
 			setState(14);
 			match(Begin);
 			setState(15);
-			sentenceList();
+			listOfSentence();
 			setState(16);
 			match(End);
 			}
@@ -130,27 +130,27 @@ public class MicroParser extends Parser {
 		return _localctx;
 	}
 
-	public static class SentenceListContext extends ParserRuleContext {
+	public static class ListOfSentenceContext extends ParserRuleContext {
 		public SentenceContext sentence() {
 			return getRuleContext(SentenceContext.class,0);
 		}
-		public SentenceListContext(ParserRuleContext parent, int invokingState) {
+		public ListOfSentenceContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_sentenceList; }
+		@Override public int getRuleIndex() { return RULE_listOfSentence; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterSentenceList(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterListOfSentence(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitSentenceList(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitListOfSentence(this);
 		}
 	}
 
-	public final SentenceListContext sentenceList() throws RecognitionException {
-		SentenceListContext _localctx = new SentenceListContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_sentenceList);
+	public final ListOfSentenceContext listOfSentence() throws RecognitionException {
+		ListOfSentenceContext _localctx = new ListOfSentenceContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_listOfSentence);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -178,13 +178,13 @@ public class MicroParser extends Parser {
 		public TerminalNode Semicolon() { return getToken(MicroParser.Semicolon, 0); }
 		public TerminalNode Read() { return getToken(MicroParser.Read, 0); }
 		public TerminalNode RightParen() { return getToken(MicroParser.RightParen, 0); }
-		public IdentifierListContext identifierList() {
-			return getRuleContext(IdentifierListContext.class,0);
+		public ListOfIdentifierContext listOfIdentifier() {
+			return getRuleContext(ListOfIdentifierContext.class,0);
 		}
 		public TerminalNode LeftParen() { return getToken(MicroParser.LeftParen, 0); }
 		public TerminalNode Write() { return getToken(MicroParser.Write, 0); }
-		public ExpessionListContext expessionList() {
-			return getRuleContext(ExpessionListContext.class,0);
+		public ListOfExpressionContext listOfExpression() {
+			return getRuleContext(ListOfExpressionContext.class,0);
 		}
 		public SentenceContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -192,11 +192,11 @@ public class MicroParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_sentence; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterSentence(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterSentence(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitSentence(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitSentence(this);
 		}
 	}
 
@@ -227,7 +227,7 @@ public class MicroParser extends Parser {
 				setState(26);
 				match(RightParen);
 				setState(27);
-				identifierList();
+				listOfIdentifier();
 				setState(28);
 				match(LeftParen);
 				}
@@ -240,7 +240,7 @@ public class MicroParser extends Parser {
 				setState(31);
 				match(RightParen);
 				setState(32);
-				expessionList();
+				listOfExpression();
 				setState(33);
 				match(LeftParen);
 				}
@@ -260,7 +260,7 @@ public class MicroParser extends Parser {
 		return _localctx;
 	}
 
-	public static class IdentifierListContext extends ParserRuleContext {
+	public static class ListOfIdentifierContext extends ParserRuleContext {
 		public List<TerminalNode> Identifier() { return getTokens(MicroParser.Identifier); }
 		public TerminalNode Identifier(int i) {
 			return getToken(MicroParser.Identifier, i);
@@ -269,23 +269,23 @@ public class MicroParser extends Parser {
 		public TerminalNode Comma(int i) {
 			return getToken(MicroParser.Comma, i);
 		}
-		public IdentifierListContext(ParserRuleContext parent, int invokingState) {
+		public ListOfIdentifierContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_identifierList; }
+		@Override public int getRuleIndex() { return RULE_listOfIdentifier; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterIdentifierList(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterListOfIdentifier(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitIdentifierList(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitListOfIdentifier(this);
 		}
 	}
 
-	public final IdentifierListContext identifierList() throws RecognitionException {
-		IdentifierListContext _localctx = new IdentifierListContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_identifierList);
+	public final ListOfIdentifierContext listOfIdentifier() throws RecognitionException {
+		ListOfIdentifierContext _localctx = new ListOfIdentifierContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_listOfIdentifier);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -321,7 +321,7 @@ public class MicroParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ExpessionListContext extends ParserRuleContext {
+	public static class ListOfExpressionContext extends ParserRuleContext {
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
@@ -332,23 +332,23 @@ public class MicroParser extends Parser {
 		public TerminalNode Comma(int i) {
 			return getToken(MicroParser.Comma, i);
 		}
-		public ExpessionListContext(ParserRuleContext parent, int invokingState) {
+		public ListOfExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_expessionList; }
+		@Override public int getRuleIndex() { return RULE_listOfExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterExpessionList(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterListOfExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitExpessionList(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitListOfExpression(this);
 		}
 	}
 
-	public final ExpessionListContext expessionList() throws RecognitionException {
-		ExpessionListContext _localctx = new ExpessionListContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_expessionList);
+	public final ListOfExpressionContext listOfExpression() throws RecognitionException {
+		ListOfExpressionContext _localctx = new ListOfExpressionContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_listOfExpression);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -401,11 +401,11 @@ public class MicroParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_expression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterExpression(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitExpression(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitExpression(this);
 		}
 	}
 
@@ -461,11 +461,11 @@ public class MicroParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_primary; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).enterPrimary(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).enterPrimary(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MicroListener ) ((MicroListener)listener).exitPrimary(this);
+			if ( listener instanceof MicroListener) ((MicroListener)listener).exitPrimary(this);
 		}
 	}
 

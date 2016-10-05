@@ -31,16 +31,16 @@ Ignore :   (' ' | '\t' | '\r'| '\n') -> skip ;
 
 // Syntactic Grammar
 
-program : Begin sentenceList End;
+program : Begin listOfSentence End;
 
-sentenceList : sentence;
+listOfSentence : sentence;
 
 sentence :  Identifier Assign expression Semicolon |
-            Read RightParen identifierList LeftParen |
-            Write RightParen expessionList LeftParen;
+            Read RightParen listOfIdentifier LeftParen |
+            Write RightParen listOfExpression LeftParen;
 
-identifierList : Identifier (Comma Identifier)*;
-expessionList : expression (Comma expression)*;
+listOfIdentifier : Identifier (Comma Identifier)*;
+listOfExpression : expression (Comma expression)*;
 
 expression : primary (Operator primary)*;
 primary : Identifier | Constant | RightParen expression LeftParen;

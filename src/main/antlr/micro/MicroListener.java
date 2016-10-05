@@ -1,4 +1,4 @@
-// Generated from Micro.g4 by ANTLR 4.5.3
+package micro;// Generated from Micro.g4 by ANTLR 4.5.3
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -17,15 +17,15 @@ public interface MicroListener extends ParseTreeListener {
 	 */
 	void exitProgram(MicroParser.ProgramContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MicroParser#sentenceList}.
+	 * Enter a parse tree produced by {@link MicroParser#listOfSentence}.
 	 * @param ctx the parse tree
 	 */
-	void enterSentenceList(MicroParser.SentenceListContext ctx);
+	void enterListOfSentence(MicroParser.ListOfSentenceContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MicroParser#sentenceList}.
+	 * Exit a parse tree produced by {@link MicroParser#listOfSentence}.
 	 * @param ctx the parse tree
 	 */
-	void exitSentenceList(MicroParser.SentenceListContext ctx);
+	void exitListOfSentence(MicroParser.ListOfSentenceContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MicroParser#sentence}.
 	 * @param ctx the parse tree
@@ -37,25 +37,25 @@ public interface MicroListener extends ParseTreeListener {
 	 */
 	void exitSentence(MicroParser.SentenceContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MicroParser#identifierList}.
+	 * Enter a parse tree produced by {@link MicroParser#listOfIdentifier}.
 	 * @param ctx the parse tree
 	 */
-	void enterIdentifierList(MicroParser.IdentifierListContext ctx);
+	void enterListOfIdentifier(MicroParser.ListOfIdentifierContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MicroParser#identifierList}.
+	 * Exit a parse tree produced by {@link MicroParser#listOfIdentifier}.
 	 * @param ctx the parse tree
 	 */
-	void exitIdentifierList(MicroParser.IdentifierListContext ctx);
+	void exitListOfIdentifier(MicroParser.ListOfIdentifierContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MicroParser#expessionList}.
+	 * Enter a parse tree produced by {@link MicroParser#listOfExpression}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpessionList(MicroParser.ExpessionListContext ctx);
+	void enterListOfExpression(MicroParser.ListOfExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MicroParser#expessionList}.
+	 * Exit a parse tree produced by {@link MicroParser#listOfExpression}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpessionList(MicroParser.ExpessionListContext ctx);
+	void exitListOfExpression(MicroParser.ListOfExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MicroParser#expression}.
 	 * @param ctx the parse tree

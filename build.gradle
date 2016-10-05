@@ -1,0 +1,17 @@
+group 'ar.edu.usal'
+version '1.0'
+
+apply plugin: 'java'
+apply plugin: 'antlr'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    antlr "org.antlr:antlr4:4.5"
+}

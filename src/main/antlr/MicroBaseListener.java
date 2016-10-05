@@ -27,13 +27,13 @@ public class MicroBaseListener implements MicroListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterListOfSentence(MicroParser.ListOfSentenceContext ctx) { }
+	@Override public void enterSentenceList(MicroParser.SentenceListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitListOfSentence(MicroParser.ListOfSentenceContext ctx) { }
+	@Override public void exitSentenceList(MicroParser.SentenceListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -51,25 +51,25 @@ public class MicroBaseListener implements MicroListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterListOfIdentifier(MicroParser.ListOfIdentifierContext ctx) { }
+	@Override public void enterIdentifierList(MicroParser.IdentifierListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitListOfIdentifier(MicroParser.ListOfIdentifierContext ctx) { }
+	@Override public void exitIdentifierList(MicroParser.IdentifierListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterListOfExpession(MicroParser.ListOfExpessionContext ctx) { }
+	@Override public void enterExpessionList(MicroParser.ExpessionListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitListOfExpession(MicroParser.ListOfExpessionContext ctx) { }
+	@Override public void exitExpessionList(MicroParser.ExpessionListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -17,15 +17,15 @@ public interface MicroListener extends ParseTreeListener {
 	 */
 	void exitProgram(MicroParser.ProgramContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MicroParser#listOfSentence}.
+	 * Enter a parse tree produced by {@link MicroParser#sentenceList}.
 	 * @param ctx the parse tree
 	 */
-	void enterListOfSentence(MicroParser.ListOfSentenceContext ctx);
+	void enterSentenceList(MicroParser.SentenceListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MicroParser#listOfSentence}.
+	 * Exit a parse tree produced by {@link MicroParser#sentenceList}.
 	 * @param ctx the parse tree
 	 */
-	void exitListOfSentence(MicroParser.ListOfSentenceContext ctx);
+	void exitSentenceList(MicroParser.SentenceListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MicroParser#sentence}.
 	 * @param ctx the parse tree
@@ -37,25 +37,25 @@ public interface MicroListener extends ParseTreeListener {
 	 */
 	void exitSentence(MicroParser.SentenceContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MicroParser#listOfIdentifier}.
+	 * Enter a parse tree produced by {@link MicroParser#identifierList}.
 	 * @param ctx the parse tree
 	 */
-	void enterListOfIdentifier(MicroParser.ListOfIdentifierContext ctx);
+	void enterIdentifierList(MicroParser.IdentifierListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MicroParser#listOfIdentifier}.
+	 * Exit a parse tree produced by {@link MicroParser#identifierList}.
 	 * @param ctx the parse tree
 	 */
-	void exitListOfIdentifier(MicroParser.ListOfIdentifierContext ctx);
+	void exitIdentifierList(MicroParser.IdentifierListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MicroParser#listOfExpession}.
+	 * Enter a parse tree produced by {@link MicroParser#expessionList}.
 	 * @param ctx the parse tree
 	 */
-	void enterListOfExpession(MicroParser.ListOfExpessionContext ctx);
+	void enterExpessionList(MicroParser.ExpessionListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MicroParser#listOfExpession}.
+	 * Exit a parse tree produced by {@link MicroParser#expessionList}.
 	 * @param ctx the parse tree
 	 */
-	void exitListOfExpession(MicroParser.ListOfExpessionContext ctx);
+	void exitExpessionList(MicroParser.ExpessionListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MicroParser#expression}.
 	 * @param ctx the parse tree

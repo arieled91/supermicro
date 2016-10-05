@@ -16,24 +16,3 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     antlr "org.antlr:antlr4:4.5"
 }
-
-/*
-def generatedJavaSourcesDir = 'src/main/java'
-
-generateGrammarSource {
-    arguments += ['-visitor']
-    outputDirectory = file(generatedJavaSourcesDir)
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir generatedJavaSourcesDir
-        }
-    }
-}
-
-clean {
-    delete generatedJavaSourcesDir
-}
-*/

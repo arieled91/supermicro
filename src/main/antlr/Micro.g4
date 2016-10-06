@@ -2,7 +2,7 @@ grammar Micro;
 
 // Lexical Grammar
 
-Begin   : 'begin' (WhiteSpace|NewLine)*;
+Begin   : 'begin';
 End     : 'end';
 Read    : 'read';
 Write   : 'write';
@@ -13,10 +13,10 @@ Identifier  : Letter+ Digit*;
 Letter : 'a'..'z' | 'A'..'Z';
 Digit : '0'..'9';
 
-Operator : AddOp | SubOp;
+Operator : AddOpetator | SubOperator;
 
-AddOp : '+';
-SubOp : '-';
+AddOpetator : '+';
+SubOperator : '-';
 
 Comma : ',';
 RightParen : ')';
@@ -34,16 +34,16 @@ Comment : '//' ~['\r''\n'|'\r'|'\n']* -> skip;
 // Syntactic Grammar
 
 primary : Identifier | Constant | LeftParen expression RightParen;
-
-expression : primary (Operator primary)*;
+rightPrimary : Operator primary;
+expression : primary rightPrimary*;
 
 listOfIdentifier : Identifier (Comma Identifier)*;
 listOfExpression : expression (Comma expression)*;
 
-readOp : Read LeftParen listOfIdentifier RightParen Semicolon;
-assignOp : Identifier Assign expression Semicolon;
-writeOp : Write LeftParen listOfExpression RightParen Semicolon;
+readOperation : Read LeftParen listOfIdentifier RightParen Semicolon;
+assignOperation : Identifier Assign expression Semicolon;
+writeOperation : Write LeftParen listOfExpression RightParen Semicolon;
 
-sentence :  readOp* assignOp* writeOp*;
+sentence :  readOperation | assignOperation | writeOperation;
 
-program : Begin sentence End EOF;
+program : Begin sentence* End EOF;

@@ -7,22 +7,53 @@ End     : 'end';
 Read    : 'read';
 Write   : 'write';
 
-Constant  : Digit+;
+If : 'if';
+Else : 'else';
+
+
+
+Constant  : ('0x' | '0b') ? Digit+ ('.' Digit+)?;
 Identifier  : Letter+ Digit*;
 
 Letter : 'a'..'z' | 'A'..'Z';
 Digit : '0'..'9';
 
-Operator : AddOpetator | SubOperator;
 
-AddOpetator : '+';
-SubOperator : '-';
+
+
+
+
+
 
 Comma : ',';
 RightParen : ')';
 LeftParen : '(';
 
 Assign : ':=';
+
+
+
+Compare : (Equals | NotEquals | Grater | GraterEquals | Lower | LowerEquals);
+
+Equals : '=';
+NotEquals : '!=';
+Grater : '>';
+GraterEquals : '>=';
+Lower : '<';
+LowerEquals : '<=';
+
+LogicalOperator : And | Or;
+
+And : '&&';
+Or  : '||';
+
+Operator : DivOperator | ProdOperator | AddOpetator | SubOperator;
+
+AddOpetator  : '+';
+SubOperator  : '-';
+ProdOperator : '*';
+DivOperator  : '/';
+
 
 Semicolon : ';';
 
@@ -40,10 +71,16 @@ expression : primary rightPrimary*;
 listOfIdentifier : Identifier (Comma Identifier)*;
 listOfExpression : expression (Comma expression)*;
 
-readOperation : Read LeftParen listOfIdentifier RightParen Semicolon;
-assignOperation : Identifier Assign expression Semicolon;
-writeOperation : Write LeftParen listOfExpression RightParen Semicolon;
+readStatement : Read LeftParen listOfIdentifier RightParen Semicolon;
+assignStatement : Identifier Assign expression  Semicolon;
+writeStatement : Write LeftParen listOfExpression RightParen  Semicolon;
 
-sentence :  readOperation | assignOperation | writeOperation;
+comparison : expression Compare expression;
+rightComparison : LogicalOperator comparison;
+elseSentences : Else statement*;
 
-program : Begin sentence* End EOF;
+ifStatement : If LeftParen comparison rightComparison* RightParen statement* (elseSentences)? End;
+
+statement :  (readStatement | assignStatement | writeStatement | ifStatement);
+
+program : Begin statement* End EOF;

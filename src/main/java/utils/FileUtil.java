@@ -1,33 +1,33 @@
+package utils;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class FileUtil {
+public class FileUtil implements IMessage{
 
     private FileUtil() {}
 
-    @NotNull public static String read(String path){
+    @NotNull public static InputStream read(@NotNull String path){
         try {
-            return new String(Files.readAllBytes(Paths.get(path)));
-        } catch (final IOException e) {
+            return Files.newInputStream(Paths.get(path));
+        } catch (final IOException ignored) {
             System.err.println(String.format(FILE_NOT_FOUND,path));
-            System.exit(5);
         }
-
-        return "";
+        System.exit(5);
+        return null;
     }
 
-    public static void write(String targetPath, Iterable<String> file){
+    public static void write(@NotNull String targetPath, @NotNull Iterable<String> file){
         try {
             Files.write(Paths.get(targetPath), file, Charset.forName("UTF-8"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             System.err.println(String.format(FILE_NOT_FOUND,targetPath));
             System.exit(5);
         }
     }
-
-    private static final String FILE_NOT_FOUND = "Error de E/S o recurso no encontrado: \"%s\"";
 }

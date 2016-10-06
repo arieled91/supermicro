@@ -1,5 +1,8 @@
 import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jetbrains.annotations.NotNull;
+import utils.FileUtil;
+import utils.IMessage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,12 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MicroJavaListener extends MicroBaseListener {
+public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
-    private List<String> file = new ArrayList<>();
+    private final List<String> file = new ArrayList<>();
     final Set<String> identifiers = new HashSet<>();
 
-    private String filePath;
+    private final String filePath;
 
     public MicroJavaListener(String filePath) {
         this.filePath = filePath;
@@ -31,40 +34,96 @@ public class MicroJavaListener extends MicroBaseListener {
         FileUtil.write(buildClassName(filePath,true),file);
     }
 
-    @Override public void exitReadOperation(MicroParser.ReadOperationContext ctx) {
-        for (TerminalNode id : ctx.listOfIdentifier().Identifier()) {
-            String declare = identifiers.contains(id.toString()) ? "" : "int ";
-            file.add(String.format("\t\tSystem.out.println(\"Ingrese %s: \");", id.toString()));
-            file.add(String.format("\t\t"+declare+"%s = read.nextInt();", id.toString()));
-            identifiers.add(id.toString());
+    @Override public void exitReadStatement(MicroParser.ReadStatementContext ctx) {
+        readStatement(ctx.listOfIdentifier());
+    }
+
+    @Override public void exitWriteStatement(MicroParser.WriteStatementContext ctx) {
+        writeStatement(ctx.listOfExpression());
+    }
+
+    @Override public void exitAssignStatement(MicroParser.AssignStatementContext ctx) {
+        assignStatement(ctx.Identifier(), ctx.expression());
+    }
+
+
+    @Override public void exitIfStatement(MicroParser.IfStatementContext ctx) {
+
+        ifStatement(ctx.comparison(), ctx.rightComparison(), ctx.statement());
+    }
+
+    public void ifStatement(MicroParser.ComparisonContext coparisson, Iterable<MicroParser.RightComparisonContext> rightComparisons,  Iterable<MicroParser.StatementContext> statements){
+        final String comparisson = comparissonToJava(coparisson, rightComparisons);
+        file.add(String.format("\t\tif(%s){",comparisson));
+        for (final MicroParser.StatementContext statement : statements) {
+            if(statement.assignStatement()!=null)
+                assignStatement(statement.assignStatement().Identifier(), statement.assignStatement().expression());
+            else if(statement.ifStatement()!=null)
+                ifStatement(statement.ifStatement().comparison(),rightComparisons, statement.ifStatement().statement());
+            else if(statement.readStatement()!=null)
+                readStatement(statement.readStatement().listOfIdentifier());
+            else if(statement.writeStatement()!=null)
+                writeStatement(statement.writeStatement().listOfExpression());
         }
+        file.add("\t\t}");
     }
 
-    @Override public void exitWriteOperation(MicroParser.WriteOperationContext ctx) {
-        String listOfExpression = listOfExpressionToJava(ctx.listOfExpression());
-        file.add(String.format("\t\tSystem.out.println(%s);",listOfExpression));
-    }
+    public void assignStatement(TerminalNode identifier, MicroParser.ExpressionContext expression){
 
-    @Override public void exitAssignOperation(MicroParser.AssignOperationContext ctx) {
-        String id = ctx.Identifier().toString();
+        final String id = identifier.toString();
 
         String line =  "\t\t";
 
         if(!identifiers.contains(id)){
-            line+="int ";
+            line+="double ";
             identifiers.add(id);
         }
 
-        line+=id+" = "+expressionToJava(ctx.expression())+";";
+        line+=id+" = "+expressionToJava(expression)+";";
         file.add(line);
     }
 
+    public void readStatement(MicroParser.ListOfIdentifierContext listOfIdentifier){
+        for (final TerminalNode id : listOfIdentifier.Identifier()) {
+            final String declare = identifiers.contains(id.toString()) ? "" : "double ";
+            file.add(String.format("\t\tSystem.out.println(\"Ingrese %s: \");", id.toString()));
+            file.add(String.format("\t\t"+declare+"%s = read.nextDouble();", id.toString()));
+            identifiers.add(id.toString());
+        }
+    }
 
-    private String listOfExpressionToJava(MicroParser.ListOfExpressionContext listOfExpression){
-        StringBuilder buffer = new StringBuilder();
+    public void writeStatement(MicroParser.ListOfExpressionContext listOfExpression){
+        final String expressions = listOfExpressionToJava(listOfExpression);
+        file.add(String.format("\t\tSystem.out.println(%s);",expressions));
+    }
 
-        for (MicroParser.ExpressionContext expression : listOfExpression.expression()) {
-            String text = expressionToJava(expression);
+
+    @NotNull private String comparissonToJava(MicroParser.ComparisonContext comparison, Iterable<MicroParser.RightComparisonContext> rightComparisons){
+        final StringBuilder buffer = new StringBuilder(leftComparissonToJava(comparison));
+
+        for (final MicroParser.RightComparisonContext rightComparison : rightComparisons) {
+            buffer.append(" ");
+            buffer.append(rightComparison.LogicalOperator().toString());
+            buffer.append(" ");
+            buffer.append(leftComparissonToJava(rightComparison.comparison()));
+        }
+        return buffer.toString();
+    }
+
+    public String leftComparissonToJava(MicroParser.ComparisonContext comparison){
+        final String compare = comparison.Compare().toString();
+        final String left = expressionToJava(comparison.expression(0));
+        final String right = expressionToJava(comparison.expression(1));
+
+        return left+" "+ compare+" "+right;
+    }
+
+
+    @NotNull private String listOfExpressionToJava(MicroParser.ListOfExpressionContext listOfExpression){
+        final StringBuilder buffer = new StringBuilder();
+
+        for (final MicroParser.ExpressionContext expression : listOfExpression.expression()) {
+            final String text = expressionToJava(expression);
             if(buffer.length()!=0 && !text.isEmpty()) buffer.append(" +\" \"+ ");
             buffer.append(expressionToJava(expression));
         }
@@ -72,9 +131,9 @@ public class MicroJavaListener extends MicroBaseListener {
         return buffer.toString();
     }
 
-    private String primaryToJava(MicroParser.PrimaryContext primary){
+    @NotNull private String primaryToJava(MicroParser.PrimaryContext primary){
         if(primary.Identifier()!=null){
-            TerminalNode id = primary.Identifier();
+            final TerminalNode id = primary.Identifier();
             checkIsDeclared(id);
             return id.toString();
         }
@@ -88,10 +147,10 @@ public class MicroJavaListener extends MicroBaseListener {
         return "";
     }
 
-    private String expressionToJava(MicroParser.ExpressionContext expression){
-        StringBuilder buffer = new StringBuilder(primaryToJava(expression.primary()));
+    @NotNull private String expressionToJava(MicroParser.ExpressionContext expression){
+        final StringBuilder buffer = new StringBuilder(primaryToJava(expression.primary()));
 
-        for (MicroParser.RightPrimaryContext rightPrimary : expression.rightPrimary()) {
+        for (final MicroParser.RightPrimaryContext rightPrimary : expression.rightPrimary()) {
             buffer.append(rightPrimary.Operator().toString());
             buffer.append(primaryToJava(rightPrimary.primary()));
         }
@@ -106,28 +165,16 @@ public class MicroJavaListener extends MicroBaseListener {
         }
     }
 
-    /*private void checkIsNotDeclared(@Nullable TerminalNode id){
-        if(id==null) return;
-        if(identifiers.contains(id.toString())){
-            System.err.printf(ID_NOT_DECLARED_ERROR, id.toString());
-            System.exit(1);
-        }else identifiers.add(id.toString());
-    }*/
-
-
     public String buildClassName(String originPath, boolean fullPath){
-        String[] pathSplit = originPath.split(File.separator);
-        String file = pathSplit[pathSplit.length - 1];
-        String name = file.replace(".m","");
-        String camelcase = name.substring(0, 1).toUpperCase() + name.substring(1); //to camelcase
+        final String[] pathSplit = originPath.split(File.separator);
+        final String fileName = pathSplit[pathSplit.length - 1];
+        final String name = fileName.replace(".m","");
+        final String camelcase = name.substring(0, 1).toUpperCase() + name.substring(1); //to camelcase
         if(fullPath){
             pathSplit[pathSplit.length - 1] = camelcase;
-            return originPath.substring(0,originPath.length()-file.length())+camelcase+".java";
+            return originPath.substring(0,originPath.length()-fileName.length())+camelcase+".java";
         }
         return camelcase;
     }
-
-
-    private static final String ID_NOT_DECLARED_ERROR = "Identifier \"%s\" is not declared\n";
 
 }

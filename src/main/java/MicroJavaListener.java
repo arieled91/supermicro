@@ -1,6 +1,6 @@
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import utils.FileUtil;
 import utils.IMessage;
 
@@ -103,7 +103,7 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
         for (final MicroParser.RightComparisonContext rightComparison : rightComparisons) {
             buffer.append(" ");
-            buffer.append(rightComparison.LogicalOperator().toString());
+            buffer.append(logicalToJava(rightComparison.LogicalOperator()));
             buffer.append(" ");
             buffer.append(leftComparissonToJava(rightComparison.comparison()));
         }
@@ -118,6 +118,17 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
         return left+" "+ compare+" "+right;
     }
 
+    public String logicalToJava(TerminalNode logicalOperator){
+        final char logicalChar = logicalOperator.getText().charAt(0);
+        switch (logicalChar){
+            case '&': return "&&";
+            case '|': return "||";
+        }
+
+        return "";
+
+        //if(logicalOperator.)
+    }
 
     @NotNull private String listOfExpressionToJava(MicroParser.ListOfExpressionContext listOfExpression){
         final StringBuilder buffer = new StringBuilder();

@@ -1,7 +1,7 @@
 begin
     read(a1,b2);
     a1 := a1+11.3;
-    if(a1>b2 && a1>0)
+    if(a1>b2 & a1>0)
         b2 := b2-1;
     else
         b2 := 4;

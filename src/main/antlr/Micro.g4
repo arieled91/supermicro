@@ -19,12 +19,6 @@ Letter : 'a'..'z' | 'A'..'Z';
 Digit : '0'..'9';
 
 
-
-
-
-
-
-
 Comma : ',';
 RightParen : ')';
 LeftParen : '(';
@@ -44,8 +38,8 @@ LowerEquals : '<=';
 
 LogicalOperator : And | Or;
 
-And : '&&';
-Or  : '||';
+And : '&';
+Or  : '|';
 
 Operator : DivOperator | ProdOperator | AddOpetator | SubOperator;
 

@@ -1,16 +1,15 @@
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import utils.IMessage;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
     private final StringBuilder code = new StringBuilder();
-
-    final Set<String> declaredId = new HashSet<>();
-    final Set<String> calledId = new HashSet<>();
+    final Map<String, TerminalNode> declaredId = new HashMap<>();
+    final Map<String, TerminalNode> calledId = new HashMap<>();
 
     private final String className;
 
@@ -46,17 +45,22 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
     @Override public void exitIfStatement(MicroParser.IfStatementContext ctx) {
 
-        ifStatement(ctx.comparison(), ctx.rightComparison(), ctx.statement());
+        ifStatement(ctx.comparison(), ctx.rightComparison(), ctx.listOfStatement().statement());
+    }
+
+    @Override public void exitMethod(MicroParser.MethodContext ctx) {
+
     }
 
     public void ifStatement(MicroParser.ComparisonContext coparisson, Iterable<MicroParser.RightComparisonContext> rightComparisons,  Iterable<MicroParser.StatementContext> statements){
-        final String comparisson = comparissonToJava(coparisson, rightComparisons);
-        code.append(String.format("if(%s){",comparisson));
+        final String comparison = comparisonToJava(coparisson, rightComparisons);
+        code.append(String.format("if(%s){",comparison));
+
         for (final MicroParser.StatementContext statement : statements) {
             if(statement.assignStatement()!=null)
                 assignStatement(statement.assignStatement().Identifier(), statement.assignStatement().expression());
             else if(statement.ifStatement()!=null)
-                ifStatement(statement.ifStatement().comparison(),rightComparisons, statement.ifStatement().statement());
+                ifStatement(statement.ifStatement().comparison(),rightComparisons, statement.ifStatement().listOfStatement().statement());
             else if(statement.readStatement()!=null)
                 readStatement(statement.readStatement().listOfIdentifier());
             else if(statement.writeStatement()!=null)
@@ -65,27 +69,28 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
         code.append("}");
     }
 
-    public void assignStatement(TerminalNode identifier, MicroParser.ExpressionContext expression){
+    public void assignStatement(@Nullable TerminalNode identifier, MicroParser.ExpressionContext expression){
+        String line =  "\t\t";
+        if(identifier!=null){
 
-        final String id = identifier.toString();
+            if(!declaredId.containsKey(identifier.toString())){
+                line+="double ";
+                declaredId.put(identifier.toString(), identifier);
+            }
 
-        String line =  "";
-
-        if(!declaredId.contains(id)){
-            line+="double ";
-            declaredId.add(id);
+            line+= identifier.toString() + " = ";
         }
 
-        line+=id+" = "+expressionToJava(expression)+";";
+        line+=expressionToJava(expression)+";";
         code.append(line);
     }
 
     public void readStatement(MicroParser.ListOfIdentifierContext listOfIdentifier){
         for (final TerminalNode id : listOfIdentifier.Identifier()) {
-            final String declare = declaredId.contains(id.toString()) ? "" : "double ";
-            code.append(String.format("System.out.println(\"Ingrese %s: \");", id.toString()));
-            code.append(String.format(""+declare+"%s = read.nextDouble();", id.toString()));
-            declaredId.add(id.toString());
+            final String declare = declaredId.containsKey(id.toString()) ? "" : "double ";
+            code.append(String.format("\t\tSystem.out.println(\"Ingrese %s: \");", id.toString()));
+            code.append(String.format("\t\t"+declare+"%s = read.nextDouble();", id.toString()));
+            declaredId.put(id.toString(), id);
         }
     }
 
@@ -95,7 +100,7 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
     }
 
 
-    @NotNull private String comparissonToJava(MicroParser.ComparisonContext comparison, Iterable<MicroParser.RightComparisonContext> rightComparisons){
+    @NotNull private String comparisonToJava(MicroParser.ComparisonContext comparison, Iterable<MicroParser.RightComparisonContext> rightComparisons){
         final StringBuilder buffer = new StringBuilder(leftComparissonToJava(comparison));
 
         for (final MicroParser.RightComparisonContext rightComparison : rightComparisons) {
@@ -140,9 +145,9 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
     }
 
     @NotNull private String primaryToJava(MicroParser.PrimaryContext primary){
-        if(primary.Identifier()!=null){
-            final TerminalNode id = primary.Identifier();
-            calledId.add(id.toString());
+        if(primary.identifierCall()!=null){
+            final TerminalNode id = primary.identifierCall().Identifier();
+            identifierCall(primary.identifierCall().Identifier());
             return id.toString();
         }
 
@@ -153,6 +158,11 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
             return "("+expressionToJava(primary.expression())+")";
 
         return "";
+    }
+
+
+    public void identifierCall(TerminalNode id){
+        calledId.put(id.toString(), id);
     }
 
     @NotNull private String expressionToJava(MicroParser.ExpressionContext expression){
@@ -167,9 +177,9 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
     }
 
     private void checkIdDeclared(){
-        for (final String id : calledId) {
-            if(id!=null && !declaredId.contains(id)){
-                System.err.printf(ID_NOT_DECLARED_ERROR, id);
+        for (TerminalNode id : calledId.values()) {
+            if(id!=null && !declaredId.containsKey(id.toString())){
+                System.err.printf(ID_NOT_DECLARED_ERROR, id.getSymbol().getLine(), id.getSymbol().getCharPositionInLine(), id.toString());
                 System.exit(1);
             }
         }

@@ -1,37 +1,34 @@
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import utils.FileUtil;
 import utils.IMessage;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
-    private final List<String> file = new ArrayList<>();
-    final Set<String> identifiers = new HashSet<>();
+    private final StringBuilder code = new StringBuilder();
 
-    private final String filePath;
+    final Set<String> declaredId = new HashSet<>();
+    final Set<String> calledId = new HashSet<>();
 
-    public MicroJavaListener(String filePath) {
-        this.filePath = filePath;
+    private final String className;
+
+    public MicroJavaListener(String className) {
+        this.className = className;
     }
 
     @Override public void enterProgram(MicroParser.ProgramContext ctx) {
-        file.add("import java.util.Scanner;\n");
-        file.add(String.format("public class %s {", buildClassName(filePath, false)));
-        file.add("\tpublic static void main(String[] args) {");
-        file.add("\t\tScanner read = new Scanner(System.in);");
+        code.append("import java.util.Scanner;\n");
+        code.append(String.format("public class %s {", className));
+        code.append("public static void main(String[] args) {");
+        code.append("Scanner read = new Scanner(System.in);");
     }
 
     @Override public void exitProgram(MicroParser.ProgramContext ctx) {
-        file.add("\t}");
-        file.add("}");
-        FileUtil.write(buildClassName(filePath,true),file);
+        code.append("}}");
+        checkIdDeclared();
+        //FileUtil.write("Test"+".java",code.toString());
     }
 
     @Override public void exitReadStatement(MicroParser.ReadStatementContext ctx) {
@@ -54,7 +51,7 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
     public void ifStatement(MicroParser.ComparisonContext coparisson, Iterable<MicroParser.RightComparisonContext> rightComparisons,  Iterable<MicroParser.StatementContext> statements){
         final String comparisson = comparissonToJava(coparisson, rightComparisons);
-        file.add(String.format("\t\tif(%s){",comparisson));
+        code.append(String.format("if(%s){",comparisson));
         for (final MicroParser.StatementContext statement : statements) {
             if(statement.assignStatement()!=null)
                 assignStatement(statement.assignStatement().Identifier(), statement.assignStatement().expression());
@@ -65,36 +62,36 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
             else if(statement.writeStatement()!=null)
                 writeStatement(statement.writeStatement().listOfExpression());
         }
-        file.add("\t\t}");
+        code.append("}");
     }
 
     public void assignStatement(TerminalNode identifier, MicroParser.ExpressionContext expression){
 
         final String id = identifier.toString();
 
-        String line =  "\t\t";
+        String line =  "";
 
-        if(!identifiers.contains(id)){
+        if(!declaredId.contains(id)){
             line+="double ";
-            identifiers.add(id);
+            declaredId.add(id);
         }
 
         line+=id+" = "+expressionToJava(expression)+";";
-        file.add(line);
+        code.append(line);
     }
 
     public void readStatement(MicroParser.ListOfIdentifierContext listOfIdentifier){
         for (final TerminalNode id : listOfIdentifier.Identifier()) {
-            final String declare = identifiers.contains(id.toString()) ? "" : "double ";
-            file.add(String.format("\t\tSystem.out.println(\"Ingrese %s: \");", id.toString()));
-            file.add(String.format("\t\t"+declare+"%s = read.nextDouble();", id.toString()));
-            identifiers.add(id.toString());
+            final String declare = declaredId.contains(id.toString()) ? "" : "double ";
+            code.append(String.format("System.out.println(\"Ingrese %s: \");", id.toString()));
+            code.append(String.format(""+declare+"%s = read.nextDouble();", id.toString()));
+            declaredId.add(id.toString());
         }
     }
 
     public void writeStatement(MicroParser.ListOfExpressionContext listOfExpression){
         final String expressions = listOfExpressionToJava(listOfExpression);
-        file.add(String.format("\t\tSystem.out.println(%s);",expressions));
+        code.append(String.format("System.out.println(%s);",expressions));
     }
 
 
@@ -145,7 +142,7 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
     @NotNull private String primaryToJava(MicroParser.PrimaryContext primary){
         if(primary.Identifier()!=null){
             final TerminalNode id = primary.Identifier();
-            checkIsDeclared(id);
+            calledId.add(id.toString());
             return id.toString();
         }
 
@@ -169,23 +166,19 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
         return buffer.toString();
     }
 
-    private void checkIsDeclared(@Nullable TerminalNode id){
-        if(id!=null && !identifiers.contains(id.toString())){
-            System.err.printf(ID_NOT_DECLARED_ERROR, id.toString());
-            System.exit(1);
+    private void checkIdDeclared(){
+        for (final String id : calledId) {
+            if(id!=null && !declaredId.contains(id)){
+                System.err.printf(ID_NOT_DECLARED_ERROR, id);
+                System.exit(1);
+            }
         }
     }
 
-    public String buildClassName(String originPath, boolean fullPath){
-        final String[] pathSplit = originPath.split(File.separator);
-        final String fileName = pathSplit[pathSplit.length - 1];
-        final String name = fileName.replace(".m","");
-        final String camelcase = name.substring(0, 1).toUpperCase() + name.substring(1); //to camelcase
-        if(fullPath){
-            pathSplit[pathSplit.length - 1] = camelcase;
-            return originPath.substring(0,originPath.length()-fileName.length())+camelcase+".java";
-        }
-        return camelcase;
+
+
+    public String getCode(){
+        return code.toString();
     }
 
 }

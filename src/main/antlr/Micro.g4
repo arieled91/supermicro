@@ -6,9 +6,11 @@ Begin   : 'begin';
 End     : 'end';
 Read    : 'read';
 Write   : 'write';
+Return  : 'return';
 
 If : 'if';
 Else : 'else';
+While : 'while';
 
 
 
@@ -58,7 +60,12 @@ Comment : '//' ~['\r''\n'|'\r'|'\n']* -> skip;
 
 // Syntactic Grammar
 
-primary : Identifier | Constant | LeftParen expression RightParen;
+
+method : Identifier (LeftParen listOfIdentifier RightParen)? statement* returnStatement? End;
+
+methodCall : Identifier LeftParen listOfExpression? RightParen;
+
+primary : Identifier | methodCall | Constant | LeftParen expression RightParen;
 rightPrimary : Operator primary;
 expression : primary rightPrimary*;
 
@@ -68,13 +75,16 @@ listOfExpression : expression (Comma expression)*;
 readStatement : Read LeftParen listOfIdentifier RightParen Semicolon;
 assignStatement : Identifier Assign expression  Semicolon;
 writeStatement : Write LeftParen listOfExpression RightParen  Semicolon;
+returnStatement : Return expression;
 
 comparison : expression Compare expression;
 rightComparison : LogicalOperator comparison;
-elseSentences : Else statement*;
+elseSentences : Else statement* returnStatement?;
 
-ifStatement : If LeftParen comparison rightComparison* RightParen statement* (elseSentences)? End;
+ifStatement : If LeftParen comparison rightComparison* RightParen statement* returnStatement? (elseSentences)? End;
+whileStatement : While LeftParen comparison rightComparison* RightParen statement* End;
 
-statement :  (readStatement | assignStatement | writeStatement | ifStatement);
 
-program : Begin statement* End EOF;
+statement :  (readStatement | assignStatement | writeStatement | ifStatement| whileStatement);
+
+program : Begin statement* returnStatement? End method* EOF;

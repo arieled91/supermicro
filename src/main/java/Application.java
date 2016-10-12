@@ -48,16 +48,17 @@ public final class Application implements IMessage {
         final MicroJavaListener listener = new MicroJavaListener(className);
         walker.walk(listener, program);
 
-        System.out.println(COMPILATION_OK);
-
         //building class
         final ClassBuilder microClass = new ClassBuilder(className, buildFilePath(filePath), listener.getMain());
 
         //builds jar file
         if(compilerArgs.contains("jar")) {
+            System.out.println(BUILDING_JAR);
             microClass.compileJar();
-            System.out.println(JAR_OK);
+
         }
+
+        System.out.println(COMPILATION_OK);
 
         //runs supermicro program
         if (compilerArgs.contains("run")) {

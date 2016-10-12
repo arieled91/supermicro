@@ -1,13 +1,17 @@
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import utils.FileUtil;
 import utils.IMessage;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MicroJavaListener extends MicroBaseListener implements IMessage{
 
-    private final StringBuilder code = new StringBuilder();
+    private final StringBuilder main = new StringBuilder();
+    private final StringBuilder methods = new StringBuilder();
     final Map<String, TerminalNode> declaredId = new HashMap<>();
     final Map<String, TerminalNode> calledId = new HashMap<>();
 
@@ -18,58 +22,83 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
     }
 
     @Override public void enterProgram(MicroParser.ProgramContext ctx) {
-        code.append("import java.util.Scanner;\n");
-        code.append(String.format("public class %s {", className));
-        code.append("public static void main(String[] args) {");
-        code.append("Scanner read = new Scanner(System.in);");
+        main.append("import java.util.Scanner;");
+        main.append(String.format("public class %s {", className));
+        main.append("private static Scanner read = new Scanner(System.in);");
+        main.append("public static void main(String[] args) {");
+
+        if(ctx.listOfStatement()!=null)
+            ctx.listOfStatement().statement().forEach(s -> main.append(statement(s)));
     }
 
     @Override public void exitProgram(MicroParser.ProgramContext ctx) {
-        code.append("}}");
+        main.append("}");
+        main.append(methods.toString());
+        main.append("}");
         checkIdDeclared();
-        //FileUtil.write("Test"+".java",code.toString());
-    }
-
-    @Override public void exitReadStatement(MicroParser.ReadStatementContext ctx) {
-        readStatement(ctx.listOfIdentifier());
-    }
-
-    @Override public void exitWriteStatement(MicroParser.WriteStatementContext ctx) {
-        writeStatement(ctx.listOfExpression());
-    }
-
-    @Override public void exitAssignStatement(MicroParser.AssignStatementContext ctx) {
-        assignStatement(ctx.Identifier(), ctx.expression());
-    }
-
-
-    @Override public void exitIfStatement(MicroParser.IfStatementContext ctx) {
-
-        ifStatement(ctx.comparison(), ctx.rightComparison(), ctx.listOfStatement().statement());
+//        FileUtil.write("Test"+".java", main.toString());
     }
 
     @Override public void exitMethod(MicroParser.MethodContext ctx) {
+        int paramSize = ctx.listOfArguments()!=null ? ctx.listOfArguments().Identifier().size() : 0;
+        declaredId.put(ctx.Identifier().getText()+"/"+paramSize, ctx.Identifier());
 
-    }
-
-    public void ifStatement(MicroParser.ComparisonContext coparisson, Iterable<MicroParser.RightComparisonContext> rightComparisons,  Iterable<MicroParser.StatementContext> statements){
-        final String comparison = comparisonToJava(coparisson, rightComparisons);
-        code.append(String.format("if(%s){",comparison));
-
-        for (final MicroParser.StatementContext statement : statements) {
-            if(statement.assignStatement()!=null)
-                assignStatement(statement.assignStatement().Identifier(), statement.assignStatement().expression());
-            else if(statement.ifStatement()!=null)
-                ifStatement(statement.ifStatement().comparison(),rightComparisons, statement.ifStatement().listOfStatement().statement());
-            else if(statement.readStatement()!=null)
-                readStatement(statement.readStatement().listOfIdentifier());
-            else if(statement.writeStatement()!=null)
-                writeStatement(statement.writeStatement().listOfExpression());
+        methods.append("public static double ");
+        methods.append(ctx.Identifier().getText());
+        methods.append("(");
+        if(ctx.listOfArguments()!=null) {
+            boolean notFirst = false;
+            for (TerminalNode id : ctx.listOfArguments().Identifier()) {
+                if (notFirst) methods.append(",");
+                methods.append("double ");
+                methods.append(id.getText());
+                notFirst = true;
+            }
         }
-        code.append("}");
+        methods.append("){");
+        String returnStatement = "return 0;";
+
+        if(ctx.listOfStatement()!=null){
+            ctx.listOfStatement().statement().forEach(s -> methods.append(statement(s)));
+            returnStatement = returnToJava(ctx.listOfStatement().returnStatement());
+        }
+
+        methods.append(returnStatement);
+        methods.append("}");
     }
 
-    public void assignStatement(@Nullable TerminalNode identifier, MicroParser.ExpressionContext expression){
+    public String returnToJava(MicroParser.ReturnStatementContext returnStatement){
+        if (returnStatement!=null)
+            return "return "+expressionToJava(returnStatement.expression())+";";
+        return "return 0;";
+    }
+
+    public String ifStatement(MicroParser.ComparisonContext comparisonContext, Iterable<MicroParser.RightComparisonContext> rightComparisons,  Iterable<MicroParser.StatementContext> statements){
+        final String comparison = comparisonToJava(comparisonContext, rightComparisons);
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("if(%s){",comparison));
+
+        statements.forEach(s -> builder.append(statement(s)));
+
+        builder.append("}");
+        return builder.toString();
+    }
+
+    public String statement(MicroParser.StatementContext statement){
+        StringBuilder builder = new StringBuilder();
+        if(statement.assignStatement()!=null)
+            builder.append(assignStatement(statement.assignStatement().Identifier(), statement.assignStatement().expression()));
+        else if(statement.ifStatement()!=null)
+            builder.append(ifStatement(statement.ifStatement().comparison(), statement.ifStatement().rightComparison(), statement.ifStatement().listOfStatement().statement()));
+        else if(statement.readStatement()!=null)
+            builder.append(readStatement(statement.readStatement().listOfIdentifier()));
+        else if(statement.writeStatement()!=null)
+            builder.append(writeStatement(statement.writeStatement().listOfExpression()));
+        return builder.toString();
+    }
+
+
+    public String assignStatement(@Nullable TerminalNode identifier, MicroParser.ExpressionContext expression){
         String line =  "\t\t";
         if(identifier!=null){
 
@@ -82,37 +111,40 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
         }
 
         line+=expressionToJava(expression)+";";
-        code.append(line);
+        return line;
     }
 
-    public void readStatement(MicroParser.ListOfIdentifierContext listOfIdentifier){
+    public String readStatement(MicroParser.ListOfIdentifierContext listOfIdentifier){
+        StringBuilder builder = new StringBuilder();
         for (final TerminalNode id : listOfIdentifier.Identifier()) {
             final String declare = declaredId.containsKey(id.toString()) ? "" : "double ";
-            code.append(String.format("\t\tSystem.out.println(\"Ingrese %s: \");", id.toString()));
-            code.append(String.format("\t\t"+declare+"%s = read.nextDouble();", id.toString()));
+            builder.append(String.format("\t\tSystem.out.println(\"Ingrese %s: \");", id.toString()));
+            builder.append(String.format("\t\t"+declare+"%s = read.nextDouble();", id.toString()));
             declaredId.put(id.toString(), id);
         }
+
+        return builder.toString();
     }
 
-    public void writeStatement(MicroParser.ListOfExpressionContext listOfExpression){
+    public String writeStatement(MicroParser.ListOfExpressionContext listOfExpression){
         final String expressions = listOfExpressionToJava(listOfExpression);
-        code.append(String.format("System.out.println(%s);",expressions));
+        return String.format("System.out.println(%s);",expressions);
     }
 
 
     @NotNull private String comparisonToJava(MicroParser.ComparisonContext comparison, Iterable<MicroParser.RightComparisonContext> rightComparisons){
-        final StringBuilder buffer = new StringBuilder(leftComparissonToJava(comparison));
+        final StringBuilder buffer = new StringBuilder(leftComparisonToJava(comparison));
 
         for (final MicroParser.RightComparisonContext rightComparison : rightComparisons) {
             buffer.append(" ");
             buffer.append(logicalToJava(rightComparison.LogicalOperator()));
             buffer.append(" ");
-            buffer.append(leftComparissonToJava(rightComparison.comparison()));
+            buffer.append(leftComparisonToJava(rightComparison.comparison()));
         }
         return buffer.toString();
     }
 
-    public String leftComparissonToJava(MicroParser.ComparisonContext comparison){
+    public String leftComparisonToJava(MicroParser.ComparisonContext comparison){
         final String compare = comparison.Compare().toString();
         final String left = expressionToJava(comparison.expression(0));
         final String right = expressionToJava(comparison.expression(1));
@@ -128,8 +160,6 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
         }
 
         return "";
-
-        //if(logicalOperator.)
     }
 
     @NotNull private String listOfExpressionToJava(MicroParser.ListOfExpressionContext listOfExpression){
@@ -149,6 +179,12 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
             final TerminalNode id = primary.identifierCall().Identifier();
             identifierCall(primary.identifierCall().Identifier());
             return id.toString();
+        }
+
+        if(primary.methodCall()!=null) {
+            int size = primary.methodCall().listOfExpression()!=null ? primary.methodCall().listOfExpression().expression().size() : 0;
+            calledId.put(primary.methodCall().Identifier()+"/"+size, primary.methodCall().Identifier());
+            return primary.methodCall().getText();
         }
 
         if(primary.Constant()!=null)
@@ -177,18 +213,18 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
     }
 
     private void checkIdDeclared(){
-        for (TerminalNode id : calledId.values()) {
-            if(id!=null && !declaredId.containsKey(id.toString())){
-                System.err.printf(ID_NOT_DECLARED_ERROR, id.getSymbol().getLine(), id.getSymbol().getCharPositionInLine(), id.toString());
+        for (String id : calledId.keySet()) {
+            if(id!=null && !declaredId.containsKey(id)){
+                TerminalNode node = calledId.get(id);
+                System.err.printf(ID_NOT_DECLARED_ERROR, node.getSymbol().getLine(), node.getSymbol().getCharPositionInLine(), id);
                 System.exit(1);
             }
         }
     }
 
 
-
-    public String getCode(){
-        return code.toString();
+    public String getMain(){
+        return main.toString();
     }
 
 }

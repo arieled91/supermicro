@@ -1,7 +1,6 @@
-package utils;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import utils.IMessage;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -23,7 +22,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-public class ClassBuilder implements IMessage{
+public class ClassBuilder implements IMessage {
 
     private static final String TEMP_PATH = System.getProperty("java.io.tmpdir");
 

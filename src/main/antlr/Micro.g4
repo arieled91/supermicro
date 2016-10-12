@@ -82,10 +82,12 @@ rightComparison : LogicalOperator comparison;
 elseSentences : Else listOfStatement;
 
 ifStatement : If LeftParen comparison rightComparison* RightParen listOfStatement (elseSentences)? End;
-//whileStatement : While LeftParen comparison rightComparison* RightParen statement* End;
+//whileStatement : While LeftParen comparison rightComparison* RightParen listOfStatement End;
 
-statement :  (readStatement | assignStatement | writeStatement | ifStatement| whileStatement);
+statement :  (readStatement | assignStatement | writeStatement | ifStatement/*| whileStatement*/);
 
 method : Identifier (LeftParen listOfArguments RightParen)? listOfStatement End;
 
-program : Begin listOfStatement End method* EOF;
+listOfMethod : method*;
+
+program : Begin listOfStatement End listOfMethod EOF;

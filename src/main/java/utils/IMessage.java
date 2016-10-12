@@ -6,6 +6,9 @@ public interface IMessage {
     String FILE_NAME_ERROR = "File name must ent with '.m'";
     String ID_NOT_DECLARED_ERROR = "Line %s:%s - Identifier \"%s\" is not declared\n";
     String IO_ERROR = "I/O Error or file not found: \"%s\"";
+    String COMPILATION_OK = "\nCOMPILATION SUCCESSFUL\n";
+    String JAR_OK = "\tJar file generated";
+    String RUNNING = "\nWelcome to Supermicro!\n";
 
     int INVALID_ARGUMENT = 22;
     int ARG_LIST_TOO_LONG = 7;

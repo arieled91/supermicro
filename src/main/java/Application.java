@@ -76,11 +76,6 @@ public final class Application implements IMessage {
             System.exit(NOT_PERMITTED);
         }
 
-        /*  if(args.length>2) {
-            System.err.println(PARAM_NUMBER_ERROR);
-            System.exit(ARG_LIST_TOO_LONG);
-        }*/
-
         final String filePath;
         if(args.length==1)
             filePath = args[0];

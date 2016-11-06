@@ -103,7 +103,7 @@ public class MicroJavaListener extends MicroBaseListener implements IMessage{
         String line =  "\t\t";
         if(identifier!=null){
 
-            if(!declaredId.containsKey(identifier.getText())){
+            if(!declaredId.containsKey(idType+identifier.getText())){
                 line+="double ";
                 declaredId.put(idType+identifier.getText(), identifier);
             }
